@@ -1,0 +1,98 @@
+import java.util.Random;
+
+// Sensor class to simulate sensor data readings
+class Sensor {
+    private String type;
+    private double value;
+
+    public Sensor(String type) {
+        this.type = type;
+    }
+
+    // Method to simulate reading data from the sensor
+    public double read() {
+        Random rand = new Random();
+        switch (type) {
+            case "WindSpeed":
+                value = 20 + (rand.nextDouble() * 30); // Wind speed between 20 to 50 m/s
+                break;
+            case "WindDirection":
+                value = rand.nextInt(360); // Wind direction in degrees
+                break;
+            case "Temperature":
+                value = -10 + (rand.nextDouble() * 40); // Temperature between -10 to 30 degrees Celsius
+                break;
+            case "Vibration":
+                value = rand.nextDouble() * 10; // Vibration level
+                break;
+            default:
+                value = 0.0;
+        }
+        return value;
+    }
+}
+
+// TurbineControl class to adjust turbine settings
+class TurbineControl {
+    private double bladeAngle;
+    private double turbineSpeed;
+
+    public TurbineControl() {
+        this.bladeAngle = 0.0;
+        this.turbineSpeed = 0.0;
+    }
+
+    public void adjustBladeAngle(double windDirection) {
+        this.bladeAngle = windDirection;
+        System.out.println("Blade angle adjusted to: " + bladeAngle + " degrees");
+    }
+
+    public void adjustTurbineSpeed(double windSpeed, double vibrationLevel) {
+        if (vibrationLevel > 5.0) {
+            this.turbineSpeed = 0.0; // Stop turbine if vibration is too high
+            System.out.println("Turbine stopped due to high vibration levels.");
+        } else {
+            this.turbineSpeed = windSpeed / 2; // Simplified control logic
+            System.out.println("Turbine speed set to: " + turbineSpeed + " RPM");
+        }
+    }
+}
+
+// Main class to run the wind turbine control system
+public class WindTurbineControlSystem {
+
+    public static void main(String[] args) {
+        // Initialize sensors
+        Sensor windSpeedSensor = new Sensor("WindSpeed");
+        Sensor windDirectionSensor = new Sensor("WindDirection");
+        Sensor temperatureSensor = new Sensor("Temperature");
+        Sensor vibrationSensor = new Sensor("Vibration");
+
+        // Initialize turbine control system
+        TurbineControl turbineControl = new TurbineControl();
+
+        // Simulate running the system
+        while (true) { // Infinite loop simulating continuous operation
+            // Collect real-time data
+            double windSpeed = windSpeedSensor.read();
+            double windDirection = windDirectionSensor.read();
+            double temperature = temperatureSensor.read();
+            double vibrationLevel = vibrationSensor.read();
+
+            // Output the sensor readings
+            System.out.printf("Wind Speed: %.2f m/s%n", windSpeed);
+            System.out.printf("Wind Direction: %.2f degrees%n", windDirection);
+            System.out.printf("Temperature: %.2f C%n", temperature);
+            System.out.printf("Vibration Level: %.2f units%n", vibrationLevel);
+
+            // Adjust turbine settings based on sensor data
+            turbineControl.adjustBladeAngle(windDirection);
+            turbineControl.adjustTurbineSpeed(windSpeed, vibrationLevel);
+
+            // Pause for a moment before the next reading (simulating time interval)
+            try {
+                Thread.sleep(1000); // Sleep for 1 second
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Handle thread interruption
+                break; // Exit the loop on interruption
+            }
